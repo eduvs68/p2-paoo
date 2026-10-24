@@ -1,0 +1,23 @@
+# Credenciais
+.env
+
+# Maven / build
+target/
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+
+# SO
+.DS_Store
+Thumbs.db
+
+# CSV oficial completo (364 MB, nao versionar). A amostra em data/ e versionada.
+data/focos_br_todos-sats_*.csv
+.neon
+node_modules/
+.env.local
