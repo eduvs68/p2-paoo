@@ -1,9 +1,12 @@
 package br.fatec.simaqinpe.controller;
 
 import br.fatec.simaqinpe.model.FocoFogo;
+import br.fatec.simaqinpe.service.ContagemMensal;
 import br.fatec.simaqinpe.service.FocoFogoService;
+import br.fatec.simaqinpe.service.OpcoesFiltro;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -44,6 +47,21 @@ public class FocoFogoController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim,
             @PageableDefault(size = 20, sort = "id") Pageable pageable) {
         return ResponseEntity.ok(service.filtrar(uf, bioma, satelite, dataInicio, dataFim, pageable));
+    }
+
+    @GetMapping("/estatisticas/mensal")
+    public ResponseEntity<List<ContagemMensal>> contarPorMes(
+            @RequestParam(required = false) String uf,
+            @RequestParam(required = false) String bioma,
+            @RequestParam(required = false) String satelite,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataInicio,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataFim) {
+        return ResponseEntity.ok(service.contarPorMes(uf, bioma, satelite, dataInicio, dataFim));
+    }
+
+    @GetMapping("/opcoes")
+    public ResponseEntity<OpcoesFiltro> listarOpcoes() {
+        return ResponseEntity.ok(service.listarOpcoes());
     }
 
     @GetMapping("/{id}")

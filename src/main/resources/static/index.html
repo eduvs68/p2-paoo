@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIMAQ INPE</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header class="topo">
+        <div class="conteudo">
+            <h1>SIMAQ INPE</h1>
+            <p>Sistema de Monitoramento e Análise de Queimadas</p>
+        </div>
+    </header>
+
+    <div id="mensagem" class="mensagem oculto" role="status"></div>
+
+    <main class="conteudo">
+        <section class="grade-topo">
+            <article class="cartao">
+                <h2>Importar arquivo do INPE</h2>
+                <p class="ajuda">Selecione um CSV de focos de fogo. A importação substitui todos os registros atuais.</p>
+                <form id="formImportar" class="linha-form">
+                    <input type="file" id="arquivoCsv" accept=".csv" aria-label="Arquivo CSV">
+                    <button type="submit" id="btnImportar" class="botao">Importar</button>
+                </form>
+                <div id="resumoImportacao" class="resumo oculto"></div>
+            </article>
+
+            <article class="cartao">
+                <h2>Buscar por ID</h2>
+                <p class="ajuda">Consulta um foco de fogo pelo identificador.</p>
+                <form id="formBusca" class="linha-form">
+                    <input type="number" id="buscaId" min="1" placeholder="Ex.: 1000" aria-label="ID do foco">
+                    <button type="submit" id="btnBuscar" class="botao">Buscar</button>
+                </form>
+                <div id="resultadoBusca" class="detalhe oculto"></div>
+            </article>
+        </section>
+
+        <section class="cartao">
+            <h2>Filtros</h2>
+            <form id="formFiltros" class="grade-filtros">
+                <div class="campo">
+                    <label for="filtroUf">UF</label>
+                    <select id="filtroUf"></select>
+                </div>
+                <div class="campo">
+                    <label for="filtroBioma">Bioma</label>
+                    <select id="filtroBioma"></select>
+                </div>
+                <div class="campo">
+                    <label for="filtroSatelite">Satélite</label>
+                    <select id="filtroSatelite"></select>
+                </div>
+                <div class="campo">
+                    <label for="filtroInicio">Data inicial</label>
+                    <input type="date" id="filtroInicio">
+                </div>
+                <div class="campo">
+                    <label for="filtroFim">Data final</label>
+                    <input type="date" id="filtroFim">
+                </div>
+                <div class="acoes-filtro">
+                    <button type="submit" id="btnFiltrar" class="botao">Filtrar</button>
+                    <button type="button" id="btnLimparFiltros" class="botao secundario">Limpar</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="cartao">
+            <h2>Em que época do ano os focos de fogo se concentram?</h2>
+            <p class="ajuda">Cada barra soma os focos detectados no mês. O gráfico respeita os filtros aplicados.</p>
+            <p id="graficoSubtitulo" class="subtitulo"></p>
+            <div class="area-grafico">
+                <canvas id="graficoMensal"></canvas>
+                <p id="graficoMensagem" class="estado-vazio oculto"></p>
+            </div>
+        </section>
+
+        <section class="grade-principal">
+            <article class="cartao">
+                <h2 id="tituloForm">Cadastrar foco</h2>
+                <form id="formFoco" class="formulario" novalidate>
+                    <div class="campo">
+                        <label for="fDataHora">Data e hora</label>
+                        <input type="datetime-local" id="fDataHora" step="1" required>
+                    </div>
+                    <div class="campo">
+                        <label for="fSatelite">Satélite</label>
+                        <input type="text" id="fSatelite" list="listaSatelites" maxlength="30" required>
+                        <datalist id="listaSatelites"></datalist>
+                    </div>
+                    <div class="campo">
+                        <label for="fUf">UF</label>
+                        <select id="fUf" required></select>
+                    </div>
+                    <div class="campo">
+                        <label for="fMunicipio">Município</label>
+                        <input type="text" id="fMunicipio" maxlength="100" required>
+                    </div>
+                    <div class="campo">
+                        <label for="fBioma">Bioma</label>
+                        <input type="text" id="fBioma" list="listaBiomas" maxlength="30" required>
+                        <datalist id="listaBiomas"></datalist>
+                    </div>
+                    <div class="campo">
+                        <label for="fLatitude">Latitude</label>
+                        <input type="number" id="fLatitude" step="any" min="-90" max="90" required>
+                    </div>
+                    <div class="campo">
+                        <label for="fLongitude">Longitude</label>
+                        <input type="number" id="fLongitude" step="any" min="-180" max="180" required>
+                    </div>
+                    <div class="campo">
+                        <label for="fRisco">Risco de fogo (0 a 1, opcional)</label>
+                        <input type="number" id="fRisco" step="0.01" min="0" max="1">
+                    </div>
+                    <div class="acoes-form">
+                        <button type="submit" id="btnSalvar" class="botao">Cadastrar</button>
+                        <button type="button" id="btnCancelarEdicao" class="botao secundario oculto">Cancelar</button>
+                    </div>
+                </form>
+            </article>
+
+            <article class="cartao">
+                <div class="cabecalho-tabela">
+                    <h2>Focos de fogo</h2>
+                    <span id="contador" class="contador">0 registros</span>
+                </div>
+                <div class="rolagem">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Data e hora</th>
+                                <th>Satélite</th>
+                                <th>UF</th>
+                                <th>Município</th>
+                                <th>Bioma</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                                <th>Risco</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabela"></tbody>
+                    </table>
+                </div>
+                <div class="paginacao">
+                    <button type="button" id="btnAnterior" class="botao secundario">Anterior</button>
+                    <span id="infoPagina">Página 1 de 1</span>
+                    <button type="button" id="btnProxima" class="botao secundario">Próxima</button>
+                    <label for="tamanhoPagina" class="rotulo-inline">Por página</label>
+                    <select id="tamanhoPagina">
+                        <option value="10">10</option>
+                        <option value="20" selected>20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer class="rodape">
+        <div class="conteudo">Dados: Programa Queimadas, INPE</div>
+    </footer>
+
+    <script src="js/chart.umd.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

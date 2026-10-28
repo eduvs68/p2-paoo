@@ -1,9 +1,11 @@
 package br.fatec.simaqinpe.service;
 
 import br.fatec.simaqinpe.model.FocoFogo;
+import br.fatec.simaqinpe.repository.FocoFogoEstatisticasRepository;
 import br.fatec.simaqinpe.repository.FocoFogoRepository;
 import br.fatec.simaqinpe.repository.FocoFogoSpecs;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,9 +18,11 @@ public class FocoFogoService {
     private static final String MSG_DUPLICADO = "Já existe um foco com a mesma data, satélite e coordenadas";
 
     private final FocoFogoRepository repository;
+    private final FocoFogoEstatisticasRepository estatisticasRepository;
 
-    public FocoFogoService(FocoFogoRepository repository) {
+    public FocoFogoService(FocoFogoRepository repository, FocoFogoEstatisticasRepository estatisticasRepository) {
         this.repository = repository;
+        this.estatisticasRepository = estatisticasRepository;
     }
 
     public Page<FocoFogo> listar(Pageable pageable) {
@@ -27,6 +31,20 @@ public class FocoFogoService {
 
     public Page<FocoFogo> filtrar(String uf, String bioma, String satelite,
                                   LocalDate dataInicio, LocalDate dataFim, Pageable pageable) {
+        return repository.findAll(montarFiltro(uf, bioma, satelite, dataInicio, dataFim), pageable);
+    }
+
+    public List<ContagemMensal> contarPorMes(String uf, String bioma, String satelite,
+                                             LocalDate dataInicio, LocalDate dataFim) {
+        return estatisticasRepository.contarPorMes(montarFiltro(uf, bioma, satelite, dataInicio, dataFim));
+    }
+
+    public OpcoesFiltro listarOpcoes() {
+        return new OpcoesFiltro(repository.listarBiomas(), repository.listarSatelites());
+    }
+
+    private Specification<FocoFogo> montarFiltro(String uf, String bioma, String satelite,
+                                                 LocalDate dataInicio, LocalDate dataFim) {
         if (dataInicio != null && dataFim != null && dataInicio.isAfter(dataFim)) {
             throw new RegistroInvalidoException("A data inicial não pode ser posterior à data final");
         }
@@ -50,7 +68,7 @@ public class FocoFogoService {
         if (dataFim != null) {
             filtro = filtro.and(FocoFogoSpecs.ate(dataFim.plusDays(1).atStartOfDay()));
         }
-        return repository.findAll(filtro, pageable);
+        return filtro;
     }
 
     public Optional<FocoFogo> buscarPorId(Long id) {
