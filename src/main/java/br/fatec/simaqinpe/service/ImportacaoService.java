@@ -24,8 +24,11 @@ public class ImportacaoService {
     private static final int TAMANHO_LOTE = 1000;
     private static final String SEPARADOR = ",";
     private static final DateTimeFormatter FORMATO_DATA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    // Os arquivos de anos anteriores (satélite de referência) não trazem a coluna satelite
+    private static final String SATELITE_PADRAO = "AQUA_M-T";
+    private static final Map<String, String> APELIDOS_COLUNAS = Map.of("lat", "latitude", "lon", "longitude");
     private static final List<String> COLUNAS_OBRIGATORIAS = List.of(
-            "latitude", "longitude", "data_pas", "satelite", "estado", "municipio", "bioma", "risco_fogo");
+            "latitude", "longitude", "data_pas", "estado", "municipio", "bioma");
 
     private final FocoFogoImportacaoRepository repository;
 
@@ -71,7 +74,8 @@ public class ImportacaoService {
         String[] nomes = linha.split(SEPARADOR, -1);
         Map<String, Integer> posicoes = new HashMap<>();
         for (int i = 0; i < nomes.length; i++) {
-            posicoes.put(nomes[i].trim().toLowerCase(), i);
+            String nome = nomes[i].trim().toLowerCase();
+            posicoes.put(APELIDOS_COLUNAS.getOrDefault(nome, nome), i);
         }
         List<String> ausentes = COLUNAS_OBRIGATORIAS.stream()
                 .filter(coluna -> !posicoes.containsKey(coluna))
@@ -126,7 +130,9 @@ public class ImportacaoService {
         }
 
         LocalDateTime dataHora = lerDataHora(cabecalho.valor(campos, "data_pas"));
-        String satelite = lerTexto(cabecalho.valor(campos, "satelite"), "Satélite", 30).toUpperCase();
+        String satelite = cabecalho.tem("satelite")
+                ? lerTexto(cabecalho.valor(campos, "satelite"), "Satélite", 30).toUpperCase()
+                : SATELITE_PADRAO;
         String uf = Estados.paraSigla(cabecalho.valor(campos, "estado"));
         if (uf == null) {
             throw new RegistroInvalidoException("Estado vazio ou desconhecido");
@@ -135,7 +141,7 @@ public class ImportacaoService {
         String bioma = lerTexto(cabecalho.valor(campos, "bioma"), "Bioma", 30);
         BigDecimal latitude = lerCoordenada(cabecalho.valor(campos, "latitude"), "Latitude", 90);
         BigDecimal longitude = lerCoordenada(cabecalho.valor(campos, "longitude"), "Longitude", 180);
-        BigDecimal riscoFogo = lerRiscoFogo(cabecalho.valor(campos, "risco_fogo"));
+        BigDecimal riscoFogo = cabecalho.tem("risco_fogo") ? lerRiscoFogo(cabecalho.valor(campos, "risco_fogo")) : null;
 
         return new FocoLinha(dataHora, satelite, uf, municipio, bioma, latitude, longitude, riscoFogo);
     }
@@ -190,6 +196,10 @@ public class ImportacaoService {
     }
 
     private record Cabecalho(Map<String, Integer> posicoes, int total) {
+
+        boolean tem(String coluna) {
+            return posicoes.containsKey(coluna);
+        }
 
         String valor(String[] campos, String coluna) {
             return campos[posicoes.get(coluna)].trim();
