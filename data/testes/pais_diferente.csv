@@ -1,0 +1,4 @@
+latitude,longitude,data_pas,satelite,pais,estado,municipio,bioma,numero_dias_sem_chuva,precipitacao,risco_fogo,id_area_industrial,frp
+ -19.733400, -55.399899,2025-01-01 00:35:00,METOP-B,Brasil,MATO GROSSO DO SUL,AQUIDAUANA,Pantanal,7.0,0.0,0.74,0,
+ -19.723600, -55.401798,2025-01-01 00:38:00,METOP-B,Brasil,MATO GROSSO DO SUL,AQUIDAUANA,Pantanal,7.0,0.0,0.76,0,
+ -34.600000, -58.400000,2025-01-01 00:40:00,METOP-B,Argentina,MATO GROSSO DO SUL,AQUIDAUANA,Pantanal,7.0,0.0,0.50,0,
