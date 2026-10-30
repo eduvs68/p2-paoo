@@ -26,6 +26,7 @@ public class ImportacaoService {
     private static final DateTimeFormatter FORMATO_DATA_HORA = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     // Os arquivos de anos anteriores (satélite de referência) não trazem a coluna satelite
     private static final String SATELITE_PADRAO = "AQUA_M-T";
+    private static final String PAIS_ACEITO = "Brasil";
     private static final Map<String, String> APELIDOS_COLUNAS = Map.of("lat", "latitude", "lon", "longitude");
     private static final List<String> COLUNAS_OBRIGATORIAS = List.of(
             "latitude", "longitude", "data_pas", "estado", "municipio", "bioma");
@@ -129,6 +130,10 @@ public class ImportacaoService {
             throw new RegistroInvalidoException("Quantidade de colunas diferente do cabeçalho");
         }
 
+        if (cabecalho.tem("pais")) {
+            validarPais(cabecalho.valor(campos, "pais"));
+        }
+
         LocalDateTime dataHora = lerDataHora(cabecalho.valor(campos, "data_pas"));
         String satelite = cabecalho.tem("satelite")
                 ? lerTexto(cabecalho.valor(campos, "satelite"), "Satélite", 30).toUpperCase()
@@ -144,6 +149,12 @@ public class ImportacaoService {
         BigDecimal riscoFogo = cabecalho.tem("risco_fogo") ? lerRiscoFogo(cabecalho.valor(campos, "risco_fogo")) : null;
 
         return new FocoLinha(dataHora, satelite, uf, municipio, bioma, latitude, longitude, riscoFogo);
+    }
+
+    private void validarPais(String pais) {
+        if (!pais.isEmpty() && !PAIS_ACEITO.equalsIgnoreCase(pais)) {
+            throw new RegistroInvalidoException("País diferente de " + PAIS_ACEITO);
+        }
     }
 
     private LocalDateTime lerDataHora(String texto) {
