@@ -204,7 +204,7 @@ function renderizarGrafico(dados) {
         anos.size > 1 ? MESES[item.mes - 1] + '/' + item.ano : MESES[item.mes - 1]);
     const valores = dados.map(item => item.total);
     const maior = Math.max(...valores);
-    const cores = valores.map(valor => valor === maior ? '#b3410f' : '#e8895f');
+    const cores = valores.map(valor => valor === maior ? '#134a7c' : '#6fa8dc');
 
     el('graficoMensagem').classList.add('oculto');
     el('graficoMensal').classList.remove('oculto');

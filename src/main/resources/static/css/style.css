@@ -1,12 +1,13 @@
 :root {
-    --fundo: #f4f1ee;
+    --fundo: #eef3f8;
     --cartao: #ffffff;
-    --texto: #2a2522;
-    --texto-suave: #6b625c;
-    --borda: #ddd6cf;
-    --destaque: #d9531e;
-    --destaque-escuro: #b3410f;
-    --topo: #2f221b;
+    --texto: #1b2733;
+    --texto-suave: #52657a;
+    --borda: #cfdbe8;
+    --destaque: #1f6fb2;
+    --destaque-escuro: #134a7c;
+    --topo: #0f2a44;
+    --azul-claro: #6fa8dc;
     --sucesso: #2f7d4f;
     --erro: #b3261e;
 }
@@ -35,7 +36,7 @@ body {
     background: var(--topo);
     color: #ffffff;
     padding: 20px 0;
-    border-bottom: 4px solid var(--destaque);
+    border-bottom: 4px solid var(--azul-claro);
 }
 
 .topo h1 {
@@ -46,7 +47,7 @@ body {
 
 .topo p {
     margin: 4px 0 0;
-    color: #e6d8cf;
+    color: #c9dcef;
 }
 
 main.conteudo {
@@ -185,7 +186,7 @@ button:focus-visible {
 }
 
 .botao.secundario:hover:not(:disabled) {
-    background: #fbeee8;
+    background: #e6f0fa;
     color: var(--destaque-escuro);
 }
 
@@ -246,7 +247,7 @@ button:focus-visible {
     padding: 12px 14px;
     border: 1px solid var(--borda);
     border-radius: 6px;
-    background: #faf8f6;
+    background: #f4f8fc;
     font-size: 14px;
 }
 
@@ -328,12 +329,12 @@ td {
 }
 
 th {
-    background: #f1ece7;
+    background: #e3edf7;
     font-size: 13px;
 }
 
 tbody tr:hover {
-    background: #fbf7f4;
+    background: #f0f6fc;
 }
 
 td.vazio {
